@@ -139,6 +139,7 @@ def section(request,SectionName):
     logged_in=False
     if request.user.is_authenticated:
         logged_in=True
+        print(UserTable.objects.filter(username=str(request.user))[0].id)
 
     obj=Product.objects.filter(section=SectionName)
     subSection=set()
@@ -276,14 +277,15 @@ def productPage(request,SectionName,subsection,pname):
         obj=Product.objects.filter(section=SectionName,subsection=subsection,pname=pname)
         
         if logged_in:
-                obj1=Rating.objects.filter(username=str(request.user),pname=pname)
+                id=UserTable.objects.filter(username=str(request.user))[0].id
+                obj1=Rating.objects.filter(userid=id,pname=pname)
 
                 #If the user has changed the rating
                 if len(obj1)!=0:
-                    Rating.objects.filter(username=str(request.user),pname=pname).update(rating=rating)
+                    Rating.objects.filter(userid=id,pname=pname,subsection=subsection).update(rating=rating)
                 #User is rating for first time
-                else:  
-                       obj1=Rating(username=str(request.user),pname=pname,rating=rating)
+                else:   
+                       obj1=Rating(userid=id,pname=pname,rating=rating,subsection=subsection)
                        obj1.save()
 
                 context={
@@ -304,8 +306,9 @@ def productPage(request,SectionName,subsection,pname):
         rating=0
 
         #If the user is logged in getting the rating of the product
+        id=UserTable.objects.filter(username=str(request.user))[0].id
         rating=0
-        obj1=Rating.objects.filter(username=str(request.user),pname=pname)
+        obj1=Rating.objects.filter(userid=id,pname=pname)
         if logged_in and len(obj1)!=0:
             rating=obj1[0].rating
 

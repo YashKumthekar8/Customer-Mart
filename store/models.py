@@ -36,6 +36,7 @@ class ViewCount(models.Model):
      count=models.BigIntegerField()     
 
 class Rating(models.Model):
-     username=models.CharField(max_length = 50)    
+     userid=models.BigIntegerField()  
+     subsection=models.CharField(max_length=100,null=False) 
      pname=models.CharField(max_length=100,null=False)
      rating=models.BigIntegerField()  
