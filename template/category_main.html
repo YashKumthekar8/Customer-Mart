@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Mart</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--enable mobile device-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--fontawesome css-->
+    <link rel="stylesheet" href="/static//static/css/font-awesome.min.css">
+    <!--bootstrap css-->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <!--animate css-->
+    <link rel="stylesheet" href="/static/css/animate-wow.css">
+    <!--main css-->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="/static/css/slick.min.css">
+    <!--responsive css-->
+    <link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+    
+    <header id="header" class="top-head">
+        <!-- /static navbar -->
+        <nav class="navbar navbar-default">
+           <div class="container-fluid">
+              <div class="row">
+                 <div class="col-md-4 col-sm-12 left-rs">
+                    <div class="navbar-header">
+                       <button type="button" id="top-menu" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"> 
+                       <span class="sr-only">Toggle navigation</span> 
+                       <span class="icon-bar"></span> 
+                       <span class="icon-bar"></span> 
+                       <span class="icon-bar"></span> 
+                       </button>
+                       <a href="/" class="navbar-brand"><img src="/static/images/logo.png" alt="" /></a>
+                    </div>
+                    <form class="navbar-form navbar-left web-sh">
+                       <div class="form">
+                        <input type="text" id="myInput" onkeyup="myFunction()" class="form-control" placeholder="Search for products">
+                       </div>
+                    </form>
+                 </div>
+                 <div class="col-md-8 col-sm-12">
+                    <div class="right-nav">
+                       <div class="login-sr">
+                          <div class="login-signup">
+                             <ul>
+                                {% if logged_in == False %}
+                                <li><a href="/login/">Login</a></li>
+                                <li><a class="custom-b" href="/register/">Sign up</a></li>
+                                {% else %}
+                                <li><a href="/logout/">Logout</a></li>
+                                {% endif %}
+                             </ul>
+                          </div>
+                       </div>
+                       <div class="help-r hidden-xs">
+                          <div class="help-box">
+                             <ul>
+                                <li> <a href="/cart/"><i class="bi bi-cart4"></i> Cart </a> </li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart4" viewBox="0 0 16 16">
+                                   <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l.5 2H5V5H3.14zM6 5v2h2V5H6zm3 0v2h2V5H9zm3 0v2h1.36l.5-2H12zm1.11 3H12v2h.61l.5-2zM11 8H9v2h2V8zM8 8H6v2h2V8zM5 8H3.89l.5 2H5V8zm0 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                                </svg>
+                             </ul>
+                             
+                          </div>
+                       </div>
+                       <div class="nav-b hidden-xs">
+                          <div class="nav-box">
+                             <ul>
+                                <li><a href="/about-us/">About</a></li>
+                                <!-- <li><a href="about-us.html">Chamb for Business</a></li> -->
+                             </ul>
+                          </div>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+           </div>
+           <!--/.container-fluid --> 
+        </nav>
+     </header>
+     <!-- Modal -->
+     
+     <div id="sidebar" class="top-nav">
+        <ul id="sidebar-nav" class="sidebar-nav">
+           <li><a href="about-us/">About</a></li>
+           <li><a href="/cart/">Cart</a></li>
+           {% if  logged_in == False %}
+           <li><a href="/login/">Login</a></li>
+           {% else %}
+           <li><a href="/logout/">Logout</a></li>
+           {% endif %}
+        </ul>
+     </div>
+     
+<center>
+   <ul  id="myUL">
+     {% for i in productList %}
+      <li class="xdata" style="display: none;" ><a href="{{i.1}}">{{i.0}}</a></li>
+     {% endfor %}
+   </ul>
+   </center>
+    <div class="page-content-product">
+        <div class="main-product">
+            <div class="container">
+            <div class="row clearfix">
+                <div class="find-box">
+                    <h1>Find your next product or<br>business partner here.</h1>
+                    <h4>It has never been easier.</h4>
+                    <center>
+                        
+                        <select class="selectpicker" onchange="if (this.value) window.location.href=this.value">
+                           <option value="">Please select an subsection</option>
+                           {% for i in object %}
+                              <option value="/section/{{i.section}}/subsection/{{i.subsection}}/"> {{i.subsection}}  </option>
+                           {% endfor %}
+
+                        </select>                        
+               </center>         
+                </div>
+            </div>
+            </div>
+            <div class="row clearfix">
+                {% for i in object %}
+                <div class="col-lg-3 col-sm-6 col-md-3">
+                    <a href="subsection/{{i.subsection}}">
+                        <div class="box-img">
+                        <h4>{{i.subsection}}</h4>
+                        <img src="{{i.url1}}" alt="" />
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+               
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="copyright">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                    <p><img width="90" src="/static/images/logo.png" alt="#" style="margin-top: -5px;" /> All Rights Reserved. Company Name © 2018</p>
+                    </div>
+                    <div class="col-md-4">
+                    <ul class="list-inline socials">
+                        <li>
+                            <a href="">
+                            <i class="fa fa-facebook" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                            <i class="fa fa-twitter" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                            <i class="fa fa-instagram" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                            <i class="fa fa-linkedin" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </footer>
+        <script>
+
+         function myFunction() {
+             var input, filter, ul, li, a, i, txtValue;
+             input = document.getElementById("myInput");
+             filter = input.value.toUpperCase();
+             ul = document.getElementById("myUL");
+             li = ul.getElementsByTagName("li"); 
+             for (i = 0; i < li.length; i++) {
+                 a = li[i].getElementsByTagName("a")[0];
+                 txtValue = a.textContent || a.innerText;
+                 if (txtValue.toUpperCase().indexOf(filter) > -1 && input.value.length!=0) {
+                     li[i].style.display = "";
+                 } else {
+                     li[i].style.display = "none";
+                 }
+             }
+             
+         }
+         </script>
+        <!--main js--> 
+        <script src="/static/js/jquery-1.12.4.min.js"></script> 
+        <!--bootstrap js--> 
+        <script src="/static/js/bootstrap.min.js"></script> 
+        <script src="/static/js/bootstrap-select.min.js"></script>
+        <script src="/static/js/slick.min.js"></script> 
+        <script src="/static/js/wow.min.js"></script>
+        <!--custom js--> 
+        <script src="/static/js/custom.js"></script>
+    </body>
+</html>
