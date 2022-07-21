@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payemnt HTML</title>
+</head>
+<body onload="document.getElementById('rzp-button1').click();">
+    <div id="success" style="display: none;">
+      <h1>Your Payment has been successful</h1>
+    </div>
+
+    <div id="fail" style="display: none;">
+        <h1>Your Payment has been failed</h1>
+    </div>
+  
+
+    <button style="display: none;" class="custom-b" id="rzp-button1">Pay</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+    var options = {
+        "key": "{{api_key}}",
+        "name": "Acme Corp",
+        "description": "Test Transaction",
+        "image": "https://example.com/your_logo",
+        "order_id": "{{oid}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function (response){
+
+            if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
+                redirect_url = '';
+            } else {
+             {% if cart == True %}   
+                 redirect_url = '/successPaymentCart/';
+              {% else %}
+                redirect_url = '/successPayment/1/{{pid}}/';
+              {% endif %}   
+            }
+            location.href = redirect_url;
+        },
+        "prefill": {
+            "name": "Gaurav Kumar",
+            "email": "gaurav.kumar@example.com",
+            "contact": "9999999999"
+        },
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+           document.getElementById('fail').style.display="block";
+           location.replace("http://127.0.0.1:8000/")
+    });
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    </script>
+    
+</body>
+</html>

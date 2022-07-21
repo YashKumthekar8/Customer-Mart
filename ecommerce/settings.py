@@ -70,26 +70,26 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
-
-mongo_uri = "mongodb+srv://Ecommerce:" + urllib.parse.quote("Ecommerce@123") + "@cluster0.xi9cy3b.mongodb.net/?retryWrites=true&w=majority"
-
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'ecommerce',
-        'CLIENT': {
-            'host':mongo_uri
-        },   
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
+
+
+
+# mongo_uri = "mongodb+srv://Ecommerce:" + urllib.parse.quote("Ecommerce@123") + "@cluster0.xi9cy3b.mongodb.net/?retryWrites=true&w=majority"
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': 'ecommerce',
+#         'CLIENT': {
+#             'host':mongo_uri
+#         },   
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -163,3 +163,7 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_REDIRECT_URL = 'store-home'
 LOGOUT_REDIRECT_URL = 'store-home'
+
+
+RAZORPAY_API_KEY='rzp_test_PWRqh3HlSen4AF'
+RAZORPAY_API_SECRET_KEY='Vq09aAKANaEDpzUu09dVfGGA'

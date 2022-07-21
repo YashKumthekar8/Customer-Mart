@@ -120,36 +120,26 @@
           {% else %}
 
          <div style="margin-top: 3%; margin-left: 3%">
-         <h4>My Cart({{noOfProduct}})</h4>
+         <h4>My orders({{noOfProduct}})</h4>
          </div>
 
          {%  for i in object %}
          <center>
          <div class="card-deck" style="margin-top: 4%; font-size: medium;">
          <div class="card">
-               <a href="/section/{{i.1.section}}/subsection/{{i.1.subsection}}/{{i.1.pname}}/"><img class="card-img-top" src="{{i.1.url1}}" alt="Card image cap"></a>
+               <a href="/section/{{i.1.section}}/subsection/{{i.1.subsection}}/{{i.pname}}/">{{i.pname}}</a>
             <div class="card-body">
-               <h5 class="card-title"><b>{{i.1.pname}} </b> </h5>
+               
                <br>
-                <p>Price = {{i.1.price}}</p>
-                <p>Quantity = {{i.0}}</p> 
-
-               <button type="button" class="btn btn-primary" style="font-size: medium;"><a href="/removeCart/{{i.1.pname}}/{{i.0}}/" style="color: white;text-decoration: none;">Remove</a></button>
+                <p>Price = {{i.amount}}</p>
+                <p>Quantity = {{i.quantity}}</p>
+                <p>Date Purchased = {{i.date}}</p> 
             </div>
+            <hr>
          </div>
       </center>
          {% endfor %}
-         <div style="margin-top: 5%; margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
-            <ul class="list-group" style="font-size: medium;">
-               <li class="list-group-item">Total Price  &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp{{price}}</li>
-               <li class="list-group-item">Total Price(Items) &nbsp &nbsp &nbsp {{quantity}}</li>
-               <li class="list-group-item">Discount</li>
-               <li class="list-group-item">Delivery Charges</li>
-               <li class="list-group-item">Total Amount &nbsp &nbsp &nbsp {{price}}</li>
-            </ul>
-            <div style="margin-top: 3%;">
-              <button class="btn btn-primary"><a href="/paymentCart/{{price}}/" style="text-decoration: none; color: white;"> Place Order</a></button>
-            </div>
+        
             {% endif %}
          </div>
          <footer>

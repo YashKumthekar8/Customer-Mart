@@ -1,3 +1,4 @@
+from datetime import datetime
 from jsonfield import JSONField
 from django.db import models
 
@@ -40,3 +41,13 @@ class Rating(models.Model):
      subsection=models.CharField(max_length=100,null=False) 
      pname=models.CharField(max_length=100,null=False)
      rating=models.BigIntegerField()  
+
+
+
+class OrderTable(models.Model):
+     oid= models.AutoField(primary_key=True) 
+     uid=models.BigIntegerField()
+     pname=models.CharField(max_length=100)
+     quantity= models.BigIntegerField()
+     amount= models.BigIntegerField()
+     date=models.DateField(default=datetime.utcnow)  

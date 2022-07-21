@@ -22,5 +22,17 @@ urlpatterns = [
 
     path('logout/', views.Logout, name ='logout'),
     path('profile/', views.Profile, name ='logout'),
+    
+    #Url for making payment for simgel product
+    path('payment/<int:quantity>/<int:pid>/',views.payment,name="make-payment"),
+    #url after payment success for single product
+    path('successPayment/<int:quantity>/<int:pid>/',views.successPayment,name="paymentSuccess"),
+    #Url for cart product
+    path('paymentCart/<int:amount>/',views.paymentCart,name="make-cartpayment"),
+    #Url for successful payment of cart
+    path('successPaymentCart/',views.successCartPayment,name="make-cartpayment"),
+
+    path('userOrders/',views.userOrders,name="UserOrders"),
+
 
 ]

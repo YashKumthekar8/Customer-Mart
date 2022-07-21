@@ -1,5 +1,7 @@
 from curses import use_default_colors
 import imp
+from itertools import product
+from locale import currency
 from multiprocessing import context
 from pickle import NONE
 import re
@@ -12,8 +14,9 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from django.contrib.auth.models import User
-
-
+import razorpay
+from ecommerce.settings import RAZORPAY_API_KEY,RAZORPAY_API_SECRET_KEY
+from .reccomend import *
 
 #Function for returning the section,subsection,product name and url
 def ListOfProducts():
@@ -77,7 +80,9 @@ def home(request):
         SectionObject.append(itr)
     
     ProductList=ListOfProducts
-
+    id=UserTable.objects.filter(username=str(request.user))[0].id
+    # print("################################################")
+    # print(fetch_data(str(id)))
     context={
         'object':SectionObject,
         'logged_in':logged_in,
@@ -193,8 +198,9 @@ def subsection(request,SectionName,subsection):
         #Filtering the products that satisfy the current filters 
         finalObject=[]
         for itr in obj:
-            if itr.price>=minPrice and itr.price<=maxPrice and itr.company in cmpy:
-                finalObject.append(itr)
+            if itr.price>=minPrice and itr.price<=maxPrice :
+                if len(cmpy)==0 or itr.company in cmpy:
+                    finalObject.append(itr)
         
         #If no product matches the current filter
         if len(finalObject)==0:
@@ -259,6 +265,11 @@ def productPage(request,SectionName,subsection,pname):
     #To check if user is logged in or not
     logged_in=False
     ProductList=ListOfProducts
+    amount=Product.objects.filter(section=SectionName,subsection=subsection,pname=pname)[0].price
+    client=razorpay.Client(auth=(RAZORPAY_API_KEY,RAZORPAY_API_SECRET_KEY))
+    client_order=client.order.create(dict(amount=(amount*100),currency='INR',payment_capture=1))        
+    order_id=client_order['id']
+    
     if request.user.is_authenticated:
         logged_in=True
         
@@ -270,6 +281,9 @@ def productPage(request,SectionName,subsection,pname):
            obj=ViewCount(pname=pname,count=1)
            obj.save()
 
+        
+        
+    
     #If the user has provided the rating to the current product
     if request.method=='POST':
         
@@ -294,7 +308,9 @@ def productPage(request,SectionName,subsection,pname):
                     'subsection':subsection,
                     'logged_in':logged_in,
                     'rating':int(rating),
-                    'productList':ProductList
+                    'productList':ProductList,
+                     'api_key':RAZORPAY_API_KEY,
+                    'oid':order_id
                 }    
                 return render(request,'productpage.html',context)   
         else:
@@ -306,11 +322,15 @@ def productPage(request,SectionName,subsection,pname):
         rating=0
 
         #If the user is logged in getting the rating of the product
-        id=UserTable.objects.filter(username=str(request.user))[0].id
+        
         rating=0
-        obj1=Rating.objects.filter(userid=id,pname=pname)
-        if logged_in and len(obj1)!=0:
-            rating=obj1[0].rating
+        
+        if logged_in :
+            op=UserTable.objects.filter(username=str(request.user))
+            id=op[0].id
+            obj1=Rating.objects.filter(userid=id,pname=pname)
+            if len(obj1)!=0:
+               rating=obj1[0].rating
 
         context={
             'object':obj,
@@ -318,7 +338,9 @@ def productPage(request,SectionName,subsection,pname):
             'subsection':subsection,
             'logged_in':logged_in,
             'rating':rating,
-            'productList':ProductList
+            'productList':ProductList,
+             'api_key':RAZORPAY_API_KEY,
+           'oid':order_id
         }    
         return render(request,'productpage.html',context)   
 
@@ -408,9 +430,35 @@ def AddCart(request,pid):
        return redirect('store-cart')      
 
 
-
+#For user profile page
 def Profile(request):
-    return render(request,'profile.html')      
+    ProductList=ListOfProducts
+    #To check if user is logged in or not and if user is not logged in redirect to login page
+    if not  request.user.is_authenticated:
+        return redirect('store-login')
+    if request.method=='POST':    
+        UserTable.objects.filter(username=str(request.user)).update(email=request.POST.get('email'),phone_no=request.POST.get('phoneno'),address=request.POST.get('address'))    
+        obj=UserTable.objects.filter(username=str(request.user))    
+        context={
+            'user':str(request.user),
+            'email':obj[0].email,
+            'address':obj[0].address,
+            'phone':obj[0].phone_no,
+            'message':"Your Details has been Changged Successfully",
+             'productList':ProductList
+        }
+        return render(request,'profile.html',context)      
+
+    else:  
+        obj=UserTable.objects.filter(username=str(request.user))    
+        context={
+            'user':str(request.user),
+            'email':obj[0].email,
+            'address':obj[0].address,
+            'phone':obj[0].phone_no,
+             'productList':ProductList,
+        }
+        return render(request,'profile.html',context)      
 
 
 
@@ -468,3 +516,101 @@ def RemoveCart(request,pname,quantity):
             'productList':ProductList
         }
         return render(request,'removeCart.html',context)
+
+
+
+
+
+#Function for payment
+def payment(request,quantity,pid):
+    client=razorpay.Client(auth=(RAZORPAY_API_KEY,RAZORPAY_API_SECRET_KEY))
+    amount=Product.objects.filter(pid=pid)[0].price
+    client_order=client.order.create(dict(amount=(amount*100),currency='INR',payment_capture=1))        
+    order_id=client_order['id']
+    context={
+        'api_key':RAZORPAY_API_KEY,
+        'oid':order_id,
+        'pid':pid,
+    }
+    return render(request,'payment.html',context)
+
+
+#Function for payment success
+def successPayment(request,quantity,pid):
+    op=UserTable.objects.filter(username=str(request.user))
+    id=op[0].id
+
+    pname=Product.objects.filter(pid=pid)[0].pname
+    amount=Product.objects.filter(pid=pid)[0].price
+
+    obj=OrderTable(uid=id,pname=pname,quantity=1,amount=amount)
+    obj.save()
+    return redirect('UserOrders')    
+
+
+
+#For the payment of the cart
+def paymentCart(request,amount):
+    client=razorpay.Client(auth=(RAZORPAY_API_KEY,RAZORPAY_API_SECRET_KEY))
+    client_order=client.order.create(dict(amount=(amount*100),currency='INR',payment_capture=1))        
+    order_id=client_order['id']
+    context={
+        'api_key':RAZORPAY_API_KEY,
+        'oid':order_id,
+        'cart':True
+    }
+    return render(request,'payment.html',context)
+
+
+#After successful payment of cart
+def successCartPayment(request):
+    op=UserTable.objects.filter(username=str(request.user))
+    id=op[0].id
+    obj=Cart.objects.filter(username=str(request.user))
+    
+    
+    plist=obj[0].plist
+    for keys in plist.keys():
+        pname=Product.objects.filter(pid=int(keys))[0].pname
+        quantity=plist[keys]
+        price=Product.objects.filter(pid=int(keys))[0].price
+        obj1=OrderTable(uid=id,pname=pname,quantity=quantity,amount=price*quantity)
+        obj1.save()
+
+    obj.delete()
+    return redirect('UserOrders')    
+
+
+#Function for user order table
+def userOrders(request):
+      
+      ProductList=ListOfProducts
+     #To check if user is logged in or not and if user is not logged in redirect to login page
+      if not  request.user.is_authenticated:
+        return redirect('store-login')
+      else:  
+        user=str(request.user)  
+
+      #Fetching the items purchased in the cart of the current user
+      id=UserTable.objects.filter(username=user)[0].id
+      obj=OrderTable.objects.filter(uid=id)
+
+      #If cart is empty
+      if len(obj) == 0 :
+         return render(request,'order.html',{"message":"You have not purchased any Product",'productList':ProductList}) 
+      else:
+         #Fetching the quantity and total products in the
+         temp=[]
+         stack=[]
+         for itr in obj:
+            stack.append(itr)
+
+         while len(stack)!=0:
+            temp.append(stack.pop())
+        
+         context={
+            'noOfProduct':len(obj),
+            'object':temp,
+            'productList':ProductList
+         }
+         return render(request,'order.html',context)

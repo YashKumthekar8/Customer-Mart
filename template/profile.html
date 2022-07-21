@@ -50,7 +50,7 @@
                      </div>
                      <form class="navbar-form navbar-left web-sh">
                         <div class="form">
-                           <input type="text" class="form-control" placeholder="Search for products">
+                           <input type="text" id="myInput" onkeyup="myFunction()" class="form-control" placeholder="Search for products">
                         </div>
                      </form>
                   </div>
@@ -84,6 +84,7 @@
                               <ul>
                                  <li><a href="/about-us/">About</a></li>
                                  <!-- <li><a href="about-us.html">Chamb for Business</a></li> -->
+                                 <li><a href="/profile/">Profile</a></li>
                               </ul>
                            </div>
                         </div>
@@ -98,6 +99,7 @@
       
       <div id="sidebar" class="top-nav">
          <ul id="sidebar-nav" class="sidebar-nav">
+            <li><a href="/profile/">Profile</a></li>
             <li><a href="about-us/">About</a></li>
             <li><a href="/cart/">Cart</a></li>
             {% if  logged_in == False %}
@@ -107,43 +109,44 @@
             {% endif %}
          </ul>
       </div>
+      <center>
+         <ul  id="myUL">
+           {% for i in productList %}
+            <li class="xdata" style="display: none;" ><a href="{{i.1}}">{{i.0}}</a></li>
+           {% endfor %}
+         </ul>
+         </center>
+         
       <div class="container">
          <div class="row">
            <div class="col">
             <ul>
-               <li style="margin-bottom: 3%; margin-top: 3%;"><a href="orders.html"><button class="btn" style="background-color: #09294c; color: white; border-radius: 0.1cm;">My Orders</button></a></li>
-               <li><a href="payment.html"><button class="btn" style="background-color: #09294c; color: white; border-radius: 0.1cm;">Payment</button></a></li>
+               <li style="margin-bottom: 3%; margin-top: 3%;"><a href="/userOrders/"><button class="btn" style="background-color: #09294c; color: white; border-radius: 0.1cm;">My Orders</button></a></li>
             </ul>
            </div>
            <div class="col">
+            {{message}}
             <div style="margin-left: 35%; margin-top: 4%; margin-right: 25%; margin-bottom: 8%; border-color: darkblue;">
                <div style="margin-bottom: 2%">
-                  <h4 style="color: darkblue;">Hello, Yash Kumthekar</h4>
+                  <h4 style="color: darkblue;">Hello {{user}}</h4>
                </div>
-               <form>
+               <form action="" method="post">
+                  {%csrf_token%}
                   <div class="row mb-3" style="margin-bottom: 3%;">
                     <div class="col-sm-10">
-                      <input type="email" class="form-control" id="inputEmail3" placeholder="Email ID">
+                      <input type="email" class="form-control" id="inputEmail3" name="email" placeholder="Email ID" value="{{email}}">
                     </div>
                   </div>
-                  <div class="row mb-3" style="margin-bottom: 3%;">
-                    <div class="col-sm-10">
-                      <input type="password" class="form-control" id="inputPassword3" placeholder="Password">
-                    </div>
-                  </div>
+
+
                   <div class="row mb-3" style="margin-bottom: 3%;">
                      <div class="col-sm-10">
-                       <input type="text" class="form-control" id="name" placeholder="User Name">
+                       <input type="text" class="form-control" id="phoneNo"  name="phoneno" placeholder="Phone Number" value="{{phone}}">
                      </div>
                    </div>
                   <div class="row mb-3" style="margin-bottom: 3%;">
                      <div class="col-sm-10">
-                       <input type="text" class="form-control" id="phoneNo" placeholder="Phone Number">
-                     </div>
-                   </div>
-                  <div class="row mb-3" style="margin-bottom: 3%;">
-                     <div class="col-sm-10">
-                       <textarea class="form-control" id="address" rows="3", placeholder="Address"></textarea>
+                       <textarea class="form-control" id="address" rows="3" name="address" placeholder="Address">{{address}}</textarea>
                      </div>
                    </div>
                   
@@ -191,6 +194,26 @@
             </div>
          </div>
       </footer>
+      <script>
+
+         function myFunction() {
+             var input, filter, ul, li, a, i, txtValue;
+             input = document.getElementById("myInput");
+             filter = input.value.toUpperCase();
+             ul = document.getElementById("myUL");
+             li = ul.getElementsByTagName("li"); 
+             for (i = 0; i < li.length; i++) {
+                 a = li[i].getElementsByTagName("a")[0];
+                 txtValue = a.textContent || a.innerText;
+                 if (txtValue.toUpperCase().indexOf(filter) > -1 && input.value.length!=0) {
+                     li[i].style.display = "";
+                 } else {
+                     li[i].style.display = "none";
+                 }
+             }
+             
+         }
+         </script>
       <!--main js--> 
       <script src="/static/js/jquery-1.12.4.min.js"></script> 
       <!--bootstrap js--> 

@@ -124,6 +124,7 @@
                               <ul>
                                  <li><a href="/about-us/">About</a></li>
                                  <!-- <li><a href="about-us.html">Chamb for Business</a></li> -->
+                                 <li><a href="/profile/">Profile</a></li>
                               </ul>
                            </div>
                         </div>
@@ -138,6 +139,7 @@
       
       <div id="sidebar" class="top-nav">
          <ul id="sidebar-nav" class="sidebar-nav">
+            <li><a href="/profile/">Profile</a></li>
             <li><a href="/about-us/">About</a></li>
             <li><a href="/cart/">Cart</a></li>
             {% if  logged_in == False %}
@@ -230,7 +232,54 @@
                      <div class="price-box-right">
                         <h4>Price</h4>
                         <h3>Rs {{object.0.price}}</h3>
-                        <a class="custom-b" href="payment.html">Buy Now</a>
+                        <!-- <button class="custom-b" id="rzp-button1">Pay</button> -->
+                        {% if logged_in == True %}
+                        <a class="custom-b" href="/payment/1/{{object.0.pid}}/">Pay</a>
+                        {% else %}
+                        <a class="custom-b" href="/login/">Pay</a>
+                        {% endif %}
+
+                        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                        <script>
+                        var options = {
+                           
+                            "key": "{{api_key}}",
+                            "name": "Acme Corp",
+                            "description": "Test Transaction",
+                            "image": "https://example.com/your_logo",
+                            "order_id": "{{oid}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                            "handler": function (response){
+                                alert(response.razorpay_payment_id);
+                                alert(response.razorpay_order_id);
+                                alert(response.razorpay_signature)
+                            },
+                            "prefill": {
+                                "name": "Gaurav Kumar",
+                                "email": "gaurav.kumar@example.com",
+                                "contact": "9999999999"
+                            },
+                            "notes": {
+                                "address": "Razorpay Corporate Office"
+                            },
+                            "theme": {
+                                "color": "#3399cc"
+                            }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.on('payment.failed', function (response){
+                                alert(response.error.code);
+                                alert(response.error.description);
+                                alert(response.error.source);
+                                alert(response.error.step);
+                                alert(response.error.reason);
+                                alert(response.error.metadata.order_id);
+                                alert(response.error.metadata.payment_id);
+                        });
+                        document.getElementById('rzp-button1').onclick = function(e){
+                            rzp1.open();
+                            e.preventDefault();
+                        }
+                        </script>
                         <a class="custom-b" href="/addTocart/{{object.0.pid}}/">Add To Cart</a>
                         <h5><i class="fa fa-clock-o" aria-hidden="true"></i> <strong>16 hours</strong> avg. responsive time</h5>
                      </div>
